@@ -4,18 +4,10 @@ var url = require('url');
 var app = http.createServer(function(request,response){
     var _url = request.url;
     var queryData = url.parse(_url, true).query;
+    var pathname = url.parse(_url, true).pathname;
     var title = queryData.id;
-    console.log(queryData.id);
 
-
-    if(_url == '/'){
-      //_url = '/index.html';
-      title = 'Welcome';
-    }
-    if(_url == '/favicon.ico'){
-      return response.writeHead(404);
-    }
-    response.writeHead(200);
+    if(pathname === '/'){
     fs.readFile(`data/${title}`, 'utf8', function(err, description){
       var template = `
       <!doctype html>
@@ -36,8 +28,13 @@ var app = http.createServer(function(request,response){
       </body>
       </html>
       `;
+        response.writeHead(200); // 웹서버 연결이 정상
         response.end(template);
-    })
+    });
+  } else {
+    response.writeHead(404);
+    response.end('Not found');
+  }
 
 
 //    console.log(__dirname + url);
