@@ -55,7 +55,13 @@ var app = http.createServer(function(request,response){
             var title = queryData.id;
             var list = templateList(filelist);
             var template = templateHTML(title, list,`<h2>${title}</h2>${description}`,
-            `<a href="/create">create</a> <a href="/update?id=${title}">update</a>`);
+            `<a href="/create">create</a>
+             <a href="/update?id=${title}">update</a>
+             <form action="delete_process" method="post">
+              <input type = "hidden" name = "id" value = "${title}">
+              <input type = "submit" value = "delete">
+             </form>
+            `);
             response.writeHead(200); // 웹서버 연결이 정상
             response.end(template);
         });
@@ -121,12 +127,26 @@ var app = http.createServer(function(request,response){
       var id = post.id;
       var title = post.title;
       var description = post.description;
-      console.log(post);
-      fs.rename(`data/${id}`,`data/${title}`,function(error){
+      //console.log(post);
+      fs.rename(`data/${id}`,`data/${title}`,function(error){  // 파일 이름 변경(old,new,callback)
         fs.writeFile(`data/${title}`, description, 'utf8', function(err){
           response.writeHead(302,{Location:`/?id=${title}`}); // 디다렉션 302 페이지를 다른곳으로 디다렉션
           response.end('success');
         });
+      });
+    });
+  } else if(pathname === '/delete_process'){ // 삭제 처리
+    var body = '';
+    request.on('data', function(data){ // post로 데이터가 조각조각 들어옴
+      body+=data;
+    });
+    request.on('end', function(){ //
+      var post = qs.parse(body);
+      var id = post.id;
+      //console.log(post);
+      fs.unlink(`data/${id}`, function(error){  // 실제 파일 삭제 처리
+        response.writeHead(302, {Location: `/`});
+        response.end();
       });
     });
   } else {
