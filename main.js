@@ -86,7 +86,7 @@ var app = http.createServer(function(request,response){
       var title = post.title;
       var description = post.description;
       fs.writeFile(`data/${title}`, description, 'utf8', function(err){
-        response.writeHead(200); // 웹서버 연결이 정상
+        response.writeHead(302,{Location:`/?id=${title}`}); // 디다렉션 302 페이지를 다른곳으로 디다렉션
         response.end('success');
       });
     });
