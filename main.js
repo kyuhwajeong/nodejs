@@ -5,6 +5,14 @@ var qs = require('querystring');
 
 var template = require('./lib/template.js');
 var path = require('path');
+var mysql = require('mysql');
+var db = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'nodejs',
+  password : '1q2w3e4r',
+  database : 'opentutorials'
+});
+db.connect();
 
 var app = http.createServer(function(request,response){
     var _url = request.url;
@@ -14,15 +22,20 @@ var app = http.createServer(function(request,response){
     if(pathname === '/'){
       if(queryData.id === undefined)
       {
-        fs.readdir(`./data`, function(error, filelist){
-          var title = 'Welcome';
-          var description = 'Hello, Node.js';
-          var list = template.List(filelist);
-          var html = template.HTML(title, list,`<h2>${title}</h2>${description}`,
-          `<a href="/create">create</a>`);
-            response.writeHead(200); // 웹서버 연결이 정상
-            response.end(html);
-        })
+        // fs.readdir(`./data`, function(error, filelist){
+        //   var title = 'Welcome';
+        //   var description = 'Hello, Node.js';
+        //   var list = template.List(filelist);
+        //   var html = template.HTML(title, list,`<h2>${title}</h2>${description}`,
+        //   `<a href="/create">create</a>`);
+        //     response.writeHead(200); // 웹서버 연결이 정상
+        //     response.end(html);
+        // })
+        db.query(`SELECT * FROM topic`,function (error, topics) {
+            console.log(topics);
+            response.writeHead(200);
+            response.end('Success');
+        });
       } else {
         fs.readdir('./data', function(error, filelist){
         var filteredId = path.parse(queryData.id).base;
