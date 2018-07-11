@@ -142,19 +142,19 @@ var app = http.createServer(function(request,response){
      });
   } else if(pathname === '/delete_process'){ // 삭제 처리
     var body = '';
-    request.on('data', function(data){ // post로 데이터가 조각조각 들어옴
-      body+=data;
-    });
-    request.on('end', function(){ //
-      var post = qs.parse(body);
-      var id = post.id;
-      var filteredId = path.parse(id).base;
-      //console.log(post);
-      fs.unlink(`data/${filteredId}`, function(error){  // 실제 파일 삭제 처리
-        response.writeHead(302, {Location: `/`});
-        response.end();
-      });
-    });
+          request.on('data', function(data){
+              body = body + data;
+          });
+          request.on('end', function(){
+              var post = qs.parse(body);
+              db.query('DELETE FROM topic WHERE id = ?', [post.id], function(error, result){
+                if(error){
+                  throw error;
+                }
+                response.writeHead(302, {Location: `/`});
+                response.end();
+              });
+          });
   } else {
     response.writeHead(404);
     response.end('Not found');
