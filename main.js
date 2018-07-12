@@ -62,6 +62,7 @@ var app = http.createServer(function(request,response){
       }
   } else if(pathname === '/create'){  // 생성 폼
     db.query(`SELECT * FROM topic`,function (error, topics) {
+      db.query(`SELECT * FROM author`,function(error2, authors){
         //console.log(topics);
         var title = 'Create';
         var list = template.List(topics);
@@ -72,14 +73,17 @@ var app = http.createServer(function(request,response){
           <p>
             <textarea name = "description" placeholder="description"></textarea>
           </p>
+          <p>
+            ${template.authorSelect(authors)}
+          </p>
           <p><input type="submit"></p>
         </form>
         `,
         `<a href="/create">create</a>`);
         response.writeHead(200);
         response.end(html);
-    });
-
+     });
+   });
   } else if(pathname === '/create_process'){
     var body = '';
     request.on('data', function(data){ // post로 데이터가 조각조각 들어옴
@@ -87,10 +91,11 @@ var app = http.createServer(function(request,response){
     });
     request.on('end', function(){ //
       var post = qs.parse(body);
+      //console.log(post);
       db.query(`
         INSERT INTO topic (title, description, created, author_id)
         VALUES(?,?, NOW(), ?)`,
-      [post.title, post.description, 1],
+      [post.title, post.description, post.author],
       function(error, result){
         if(error){
           throw error;
