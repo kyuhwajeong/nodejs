@@ -114,6 +114,7 @@ var app = http.createServer(function(request,response){
           if(error2){
             throw error2;
           }
+          db.query('SELECT * FROM author', function(error2, authors){
           var list = template.List(topics);
           var html = template.HTML(topic[0].title, list,
             `
@@ -124,6 +125,9 @@ var app = http.createServer(function(request,response){
                 <textarea name="description" placeholder="description">${topic[0].description}</textarea>
               </p>
               <p>
+                ${template.authorSelect(authors, topic[0].author_id)}
+              </p>
+              <p>
                 <input type="submit">
               </p>
             </form>
@@ -132,6 +136,7 @@ var app = http.createServer(function(request,response){
           );
           response.writeHead(200);
           response.end(html);
+         });
         });
       });
   } else if(pathname === '/update_process'){
@@ -141,7 +146,7 @@ var app = http.createServer(function(request,response){
      });
      request.on('end', function(){
          var post = qs.parse(body);
-         db.query('UPDATE topic SET title=?, description=?, author_id=1 WHERE id=?', [post.title, post.description, post.id], function(error, result){
+         db.query('UPDATE topic SET title=?, description=?, author_id=? WHERE id=?', [post.title, post.description, post.author, post.id], function(error, result){
            response.writeHead(302, {Location: `/?id=${post.id}`});
            response.end();
          })
