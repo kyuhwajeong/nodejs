@@ -1,18 +1,9 @@
 var http = require('http');
-var fs = require('fs');
 var url = require('url');
 var qs = require('querystring');
 
 var template = require('./lib/template.js');
-var path = require('path');
-var mysql = require('mysql');
-var db = mysql.createConnection({
-  host     : 'localhost',
-  user     : 'nodejs',
-  password : '1q2w3e4r',
-  database : 'opentutorials'
-});
-db.connect();
+var db = require('./lib/db');
 
 var app = http.createServer(function(request,response){
     var _url = request.url;
