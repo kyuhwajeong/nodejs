@@ -8,6 +8,7 @@ var sanitizeHtml = require('sanitize-html');
 var template = require('./lib/template.js');
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(compression());
 
 //route, routing
 //app.get('/', (req, res) => res.send('Hello World!'))
