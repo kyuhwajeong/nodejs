@@ -8,9 +8,10 @@ var sanitizeHtml = require('sanitize-html');
 var compression = require('compression');
 var template = require('./lib/template.js');
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(compression());
-app.get('*',function(request, response, next){
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: false }));  //third-party middleware
+app.use(compression());                               //third-party middleware
+app.get('*',function(request, response, next){        //application-level middleware
   fs.readdir('./data', function(error, filelist){
     request.list = filelist;
     next();
@@ -24,7 +25,9 @@ app.get('/', function(request, response) {
       var description = 'Hello, Node.js';
       var list = template.List(request.list);
       var html = template.HTML(title, list,
-        `<h2>${title}</h2>${description}`,
+        `<h2>${title}</h2>${description}
+        <img src="/images/hello.jpg" style="width:300px; display:block; margin-top:10px;">
+        `,
         `<a href="/create">create</a>`
       );
       response.send(html);
